@@ -1,0 +1,21 @@
+version: "3"
+
+services:
+  wireguard_site:
+    build: .
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+        # devices:
+        #   - "/dev/net/tun:/dev/net/tun"
+    container_name: wireguard_site
+    ports:
+      - "5060:5060/udp"
+    volumes:
+      - /out:/out
+      - ./bin:/usr/local/bin
+      - ./conf:/etc/wireguard
+
+    # environment:
+    restart: always
+    command: ["wireguard_site_start.sh"]
