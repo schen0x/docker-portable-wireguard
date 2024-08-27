@@ -48,9 +48,10 @@ RUN cat $KEYDIR/$PRESHARED_KEY
 
 
 # Generate the Wireguard Conf
-COPY ./bin/makeconf.sh /usr/local/bin/makeconf.sh
-RUN chmod +x /usr/local/bin/makeconf.sh
-COPY ./conf ${WG_MAKECONF_DIR}
+ADD ./bin /usr/local/bin
+RUN chmod a+x /usr/local/bin/*
+
+ADD ./conf ${WG_MAKECONF_DIR}
 RUN ls -lah /sys/class/net/
 
 RUN /usr/local/bin/makeconf.sh ${WG_MAKECONF_DIR} ${KEYDIR} ${PRIVATE_KEY} ${PUBLIC_KEY} ${PRESHARED_KEY} ${WIREGUARD_SERVER_PUBLICIP} ${WIREGUARD_SERVER_LISTENING_PORT} ${SITE_INET_CIDR} ${BUILD_TARGET}

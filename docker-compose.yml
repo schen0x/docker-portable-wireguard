@@ -13,18 +13,18 @@ services:
     cap_add:
       - NET_ADMIN
       - NET_RAW
-    devices:
+        #devices:
       #- "/dev/net/tun:/dev/net/tun"
-      - "/dev/stdout:/dev/stdout"
     container_name: wireguard_site
     ports:
       - "5060:5060/udp"
     volumes:
-      - /out:/out
-      - ./bin:/usr/local/bin
-      - ./conf:/etc/wireguard
-
+      - ./mnt:/mnt
+      - ./mnt:/etc/wireguard
+    # debug
+    tty: true
+    stdin_open: true
     # environment:
-    restart: always
-      # command: ["/usr/local/bin/wireguard_start.sh"]
-    command: ["/bin/sh"]
+    restart: on-failure
+    command: ["/usr/local/bin/wireguard_start.sh"]
+      # command: ["/bin/sh"]
