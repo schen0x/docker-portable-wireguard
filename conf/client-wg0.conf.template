@@ -11,6 +11,6 @@ PostDown = iptables -D FORWARD -i %i -j ACCEPT; iptables -t nat -D POSTROUTING -
 PublicKey = PUBLIC_KEY
 PresharedKey = PRESHARED_KEY
 # AllowedIPs = 0.0.0.0/0, ::/0
-AllowedIPs = 10.17.0.0/24, INET_CIDR
+AllowedIPs = 10.17.0.0/24, SITE_INET_CIDR
 Endpoint = WIREGUARD_SERVER_PUBLICIP:WIREGUARD_SERVER_LISTENING_PORT
 PersistentKeepalive = 25
