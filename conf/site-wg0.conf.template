@@ -1,0 +1,16 @@
+## Changeme: PRIVATE_KEY, PUBLIC_KEY, INTERNAL_IP_INTERFACE, WIREGUARD_SERVER_PUBLICIP, LISTENING_PORT, PRESHARED_KEY
+[Interface]
+PrivateKey = PRIVATE_KEY
+Address = 10.17.0.2/24
+DNS = 1.1.1.1, 1.0.0.1
+
+PostUp = iptables -A FORWARD -i %i -j ACCEPT; iptables -t nat -A POSTROUTING -o INTERNAL_IP_INTERFACE -j MASQUERADE
+PostDown = iptables -D FORWARD -i %i -j ACCEPT; iptables -t nat -D POSTROUTING -o INTERNAL_IP_INTERFACE -j MASQUERADE
+
+[Peer]
+PublicKey = PUBLIC_KEY
+PresharedKey = PRESHARED_KEY
+# AllowedIPs = 0.0.0.0/0, ::/0
+AllowedIPs = 10.17.0.0/24
+Endpoint = WIREGUARD_SERVER_PUBLICIP:LISTENING_PORT
+PersistentKeepalive = 25

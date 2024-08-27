@@ -1,21 +1,28 @@
-version: "3"
-
 services:
   wireguard_site:
-    build: .
+    build:
+      context: .
+        # network: host
+      args:
+        # server | site | client
+        BUILD_TARGET: server
+        # changeme (used on client)
+        WIREGUARD_SERVER_PUBLICIP: 0.0.0.0
+        LISTENING_PORT: 5060
     cap_add:
       - NET_ADMIN
       - NET_RAW
-        # devices:
-        #   - "/dev/net/tun:/dev/net/tun"
+    devices:
+      #- "/dev/net/tun:/dev/net/tun"
+      - "/dev/stdout:/dev/stdout"
     container_name: wireguard_site
     ports:
       - "5060:5060/udp"
     volumes:
       - /out:/out
       - ./bin:/usr/local/bin
-      - ./conf:/etc/wireguard
 
     # environment:
     restart: always
-    command: ["wireguard_site_start.sh"]
+      # command: ["/usr/local/bin/wireguard_start.sh"]
+    command: ["/bin/sh"]

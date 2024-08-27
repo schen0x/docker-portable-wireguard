@@ -1,6 +1,6 @@
-## Changeme: PRIVATE KEY, PUBLIC KEY, INTERNAL_IP_INTERFACE, LISTENING_PORT INET_CIDR
+## Changeme: PRIVATE_KEY, PUBLIC_KEY, INTERNAL_IP_INTERFACE, LISTENING_PORT, INET_CIDR, PRESHARED_KEY
 [Interface]
-Address = 10.9.0.1/24
+Address = 10.17.0.1/24
 ListenPort = LISTENING_PORT
 PrivateKey = PRIVATE_KEY
 SaveConfig = false
@@ -8,7 +8,14 @@ SaveConfig = false
 PostUp = iptables -A FORWARD -i %i -j ACCEPT; iptables -t nat -A POSTROUTING -o INTERNAL_IP_INTERFACE -j MASQUERADE
 PostDown = iptables -D FORWARD -i %i -j ACCEPT; iptables -t nat -D POSTROUTING -o INTERNAL_IP_INTERFACE -j MASQUERADE
 
-# client1
+# site
 [Peer]
 PublicKey = PUBLIC_KEY
-AllowedIPs = 10.9.0.2/32, INET_CIDR
+PresharedKey = PRESHARED_KEY
+AllowedIPs = 10.17.0.2/32, INET_CIDR
+
+# client
+[Peer]
+PublicKey = PUBLIC_KEY
+PresharedKey = PRESHARED_KEY
+AllowedIPs = 10.17.0.3/32

@@ -1,26 +1,61 @@
 # syntax=docker/dockerfile:1
 
 # --cap-add=NET_ADMIN --cap-add=NET_RAW
+# https://docs.docker.com/reference/dockerfile/#understand-how-arg-and-from-interact
+# An ARG declared before a FROM is outside of a build stage, so it can't be used in any instruction after a FROM. To use the default value of an ARG declared before the first FROM use an ARG instruction without a value inside of a build stage:
+ARG BUILD_TARGET=server
+ARG WIREGUARD_SERVER_PUBLICIP=127.0.0.1
+ARG LISTENING_PORT=5060
 
-FROM alpine:3.20
+#FROM alpine:3.20
+FROM ubuntu:24.04
 
-# set version label
-ARG BUILD_DATE
-ARG VERSION
-ARG WIREGUARD_RELEASE
-LABEL build_version="Linuxserver.io version:- ${VERSION} Build-date:- ${BUILD_DATE}"
+# TL;DR, if want to use the ARG after FROM, define the ARG again
+ARG BUILD_TARGET
+ARG WIREGUARD_SERVER_PUBLICIP
+ARG LISTENING_PORT
 
-RUN \
-    # -U update cache \
-    apk add -U wireguard-tools \
-      iptables ip6tables \
-      # openrc: rc-update  rc-service \
-      openrc \
+# RUN \
+#     # -U update cache \
+#     apk add -U wireguard-tools \
+#       iptables \
+#       # ip6tables \
+#       # openrc: rc-update  rc-service \
+#       openrc \
+#       # iproute2: ip command \
+#       iproute2
 
-RUN rc-update add iptables
+RUN apt -y update && apt -y upgrade
+RUN apt -y install wireguard iptables iproute2
+
+
+# Key can be copied during the entry script later.
+ARG KEYDIR=/srv/wg-pki
+# the filenames
+ARG PRIVATE_KEY=private_key
+ARG PUBLIC_KEY=public_key
+ARG PRESHARED_KEY=preshared_key
+
+WORKDIR ${KEYDIR}
+RUN [[ ! -f ${PRIVATE_KEY} ]] && wg genkey > ${PRIVATE_KEY} && wg pubkey < ${PRIVATE_KEY} > ${PUBLIC_KEY}
+RUN [[ ! -f ${PRESHARED_KEY} ]] && wg genpsk > ${PRESHARED_KEY}
+
+
+# Generate the Wireguard Conf
+COPY ./bin/makeconf.sh /usr/local/bin/makeconf.sh
+COPY ./conf /etc/wireguard
+RUN ls -lah /sys/class/net/
+RUN /bin/sh /usr/local/bin/makeconf.sh /etc/wireguard/ ${BUILD_TARGET} ${KEYDIR} ${PRIVATE_KEY} ${PUBLIC_KEY} ${PRESHARED_KEY} ${WIREGUARD_SERVER_PUBLICIP} ${LISTENING_PORT}
+RUN ls -lah /etc/wireguard
+RUN cat /etc/wireguard/wg0.conf
+
+# COPY /etc/wireguard/wg0.conf /out/wg0.conf
+# RUN rc-update add iptables
 # save the firewall rules to disk
-RUN rc-service iptables save
+# RUN rc-service iptables save
 # RUN rc-update add ip6tables
+
+
 
 
 
