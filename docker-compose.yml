@@ -8,7 +8,8 @@ services:
         BUILD_TARGET: server
         # changeme (used on client)
         WIREGUARD_SERVER_PUBLICIP: 0.0.0.0
-        LISTENING_PORT: 5060
+        WIREGUARD_SERVER_LISTENING_PORT: 5060
+        SITE_INET_CIDR: 192.168.1.0/24
     cap_add:
       - NET_ADMIN
       - NET_RAW
@@ -21,6 +22,7 @@ services:
     volumes:
       - /out:/out
       - ./bin:/usr/local/bin
+      - ./conf:/etc/wireguard
 
     # environment:
     restart: always
